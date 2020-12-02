@@ -10,12 +10,13 @@ import { DragItem } from './DragItem'
 import { isHidden } from './utils/isHidden'
 
 interface ColumnProps {
-  text: string,
-  index: number,
+  text: string
+  index: number
   id: string
+  isPreview?: boolean
 }
 
-export const Column = ({ text, index, id }: ColumnProps) => {
+export const Column = ({ text, index, id, isPreview }: ColumnProps) => {
   const [, drop] = useDrop({
     accept: 'COLUMN',
     hover(item: DragItem) {
@@ -32,10 +33,20 @@ export const Column = ({ text, index, id }: ColumnProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const { drag } = useItemDrag({ type: 'COLUMN', id, index, text })
   drag(drop(ref))
-  return (<ColumnContainer ref={ref} isHidden={isHidden(state.draggedItem, 'COLUMN', id)}>
+  return (<ColumnContainer
+    isPreview={isPreview}
+    ref={ref}
+    isHidden={isHidden(isPreview, state.draggedItem, 'COLUMN', id)}
+  >
     <ColumnTitle>{text}</ColumnTitle>
-    {state.lists[index].tasks.map((task) =>
-      <Card text={task.text} key={task.id} />
+    {state.lists[index].tasks.map((task, i) =>
+      <Card
+        text={task.text}
+        key={task.id}
+        id={task.id}
+        index={i}
+        columnId={task.id}
+      />
     )}
     <AddNewItem
       toggleButtonText="+ Добавить задачу"
